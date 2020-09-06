@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smoak | Music Player</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="main">
+      <div class="music_player">
+        <h2 id="title">Cry baby</h2>
+        <h3 id="artist">Melanie Martinez</h3>
+        <div class="muisc-img">
+          <img src="/Thumb/playdate.jpg" />
+        </div>
+        <audio id="player" src="/music/playdate.mp3"></audio>
+        <!-- <div class="vol-controle">
+          <i onclick = "document.getElementById('player').volume += 0.2" class="fa fa-volume-up"></i>
+          <i onclick = "document.getElementById('player').volume -= 0.2" class="fa fa-volume-down"></i>
+       </div> -->
+       <!-- ----------progress bar----------------- -->
+       <div class="pro_container" id="pro_container">
+
+          <div class="pro_dur_meter">
+            <div id="current_time">0:00</div>
+            <div id="duration">2:59</div>
+          </div>
+
+          <div class="pro_div" id="pro_div">
+            <div class="pro" id="pro"></div>
+          </div>
+        
+       </div>
+       
+
+
+        <!-- --------controls--------- -->
+
+        <div class="controls">
+          <i class="fa fa-backward" id="prev" title="Previous"></i>
+          <i class="fa fa-play main-btn" id="play" title="Play"></i>
+          <i class="fa fa-forward" id="next" title="Next"></i>
+        </div>
+
+        <!-- ----#----controls------#--- -->
+      </div>
+    </div>
+
+    <script>
+      const music = document.querySelector("audio");
+      const play = document.getElementById("play");
+      const next = document.getElementById("next");
+      const prev = document.getElementById("prev");
+      const title = document.getElementById("title");
+      const artist = document.getElementById("artist");
+      const img = document.querySelector("img");
+      const pro_div = document.getElementById("pro_div");
+      let total_duration = document.getElementById('duration');
+      let current_time = document.getElementById('current_time');
+
+      let isPlaying = false;
+
+      const playMusic = () => {
+        isPlaying = true;
+        music.play();
+        play.classList.replace("fa-play", "fa-pause");
+        img.classList.add("animation");
+      };
+
+      const pauseMusic = () => {
+        isPlaying = false;
+        music.pause();
+        play.classList.replace("fa-pause", "fa-play");
+        img.classList.remove("animation");
+      };
+
+      play.addEventListener("click", () => {
+        if (isPlaying) {
+          pauseMusic();
+        } else {
+          playMusic();
+        }
+      });
+
+      // music data
+
+      const songs = [
+        {
+          name: "playdate",
+          title: "Cry baby",
+          artist: "Melanie Martinez",
+        },
+        {
+          name: "on my way",
+          title: "On My Way",
+          artist: "Alan Walker",
+        },
+        {
+          name: "Love Me Like You Do",
+          title: "Love Me Like You Do",
+          artist: "Ellie Goulding",
+        },
+        {
+          name: "shape-of-you",
+          title: " Shape of You ",
+          artist: "Ed Sheeran",
+        },
+        {
+          name: "Despacito",
+          title: " Despacito",
+          artist: "Luis Fonsi",
+        },
+      ];
+      const loadSong = (songs) => {
+        title.textContent = songs.title;
+        artist.textContent = songs.artist;
+        music.src = "music/" + songs.name + ".mp3";
+        img.src = "Thumb/" + songs.name + ".jpg";
+      };
+
+      songIndex = 0;
+     
+      const nextSong = () => {
+        songIndex = (songIndex + 1) % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+      const prevSong = () => {
+        songIndex = (songIndex - 1 + songs.length)  % songs.length;
+        loadSong(songs[songIndex]);
+        playMusic();
+      };
+      // progress js 
+
+      let progress = document.getElementById('pro')
+
+      music.addEventListener("timeupdate" , (event) =>{
+        const { currentTime, duration } = event.srcElement
+        let progress_time = (currentTime / duration) * 100;
+        progress.style.width = `${progress_time}%`;
+
+        // music duretion
+        let min_duration = Math.floor(duration / 60);
+        let sec_duration = Math.floor(duration % 60);
+        if(sec_duration < 10){
+          sec_duration = `0${sec_duration}`;}
+        let all_duration = `${min_duration}:${sec_duration}`;
+        if(duration){
+          total_duration.textContent = `${all_duration}`;
+        }
+
+        // music currentTime
+        let min_currentTime = Math.floor(currentTime / 60);
+        let sec_currentTime = Math.floor(currentTime % 60);
+        
+        
+        if(sec_currentTime < 10){
+          sec_currentTime = `0${sec_currentTime}`;}
+        let all_currentTime = `${min_currentTime}:${sec_currentTime}`;
+        current_time.textContent = `${all_currentTime}`;
+        
+        
+      });
+
+      pro_div.addEventListener("click", (event) => {
+        // console.log(event);
+        const { duration } = music;
+        let move_progress = 
+        (event.offsetX / event.srcElement.clientWidth) * duration ;
+        
+        console.log(duration);
+        console.log(move_progress);
+        music.currentTime = move_progress;
+      
+      });
+
+      // music add to play next song
+      music.addEventListener("ended" , nextSong);
+
+      next.addEventListener("click", nextSong);
+      prev.addEventListener("click", prevSong);
+    </script>
+  </body>
+</html>
